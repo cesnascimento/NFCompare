@@ -1,7 +1,6 @@
 import tabula
 import re
 import os
-from smb.SMBConnection import SMBConnection
 
 
 def open_file():
