@@ -7,23 +7,24 @@ locale.setlocale(locale.LC_MONETARY, '')
 
 
 def open_nfd():
-    file = open('1200010006361.xml')
+    file = open('cosmoprime.xml')
     return file
 
 
 def get_cnpj_ref(file):
-    soup = BeautifulSoup(file, 'xml')
-    cnpj = soup.find('CNPJ')
+    soup = BeautifulSoup(file, 'lxml')
+    cnpj = soup.findAll('cnpj')[1].getText()
     return cnpj
 
 
-def get_ref(file):
-    soup = BeautifulSoup(file, 'xml')
-    codigo_ref = soup.find('nNF').getText()
-    return codigo_ref
+def get_code_ref(file):
+    soup = BeautifulSoup(file, 'lxml')
+    code_ref = soup.find('refnfe').getText()
+    code_ref = code_ref[30:34]
+    return code_ref
 
 
-def get_info_products_nf(file):
+'''def get_info_products_nf(file):
     products = dict()
     soup = BeautifulSoup(file, 'xml')
     name_products, code_products, unit_products, price_products = soup.findAll(
@@ -39,6 +40,7 @@ def get_info_products_nf(file):
 def get_folder_network(cnpj):
     path = '\\\\dmsrv-dts/XML_Danfe/'
     folders = os.listdir(path)
+    print(path)
     for folder in folders:
         if folder in cnpj:
             path = os.path.join(path, folder)
@@ -62,20 +64,21 @@ def get_doc_ref(path):
         return file_xml
 
 
-def open_nfe(file_xml):
-    print(file_xml)
-    with open(file_xml) as f:
-        soup = BeautifulSoup(f'\\{f}', 'xml')
-        print('pagina aberta')
-    pass
+def open_nfe_compare(file_xml):
+    file = open(file_xml)
+    soup = BeautifulSoup(file, 'xml')
+    print(soup)
+    pass'''
 
 
 
 def start():
-    a = get_doc_ref(get_folder_network(get_cnpj_ref(open_nfd())))
+     get_cnpj_ref(open_nfd())
+     get_code_ref(open_nfd())
+'''a = get_doc_ref(get_folder_network(get_cnpj_ref(open_nfd())))
     get_info_products_nf(open_nfd())
     open_nfd().close()
-    open_nfe(a)
-
+    open_nfe_compare(a)
+'''
 
 start()
