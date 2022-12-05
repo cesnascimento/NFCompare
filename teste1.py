@@ -6,8 +6,10 @@ from bs4 import BeautifulSoup
 locale.setlocale(locale.LC_MONETARY, '')
 
 
-def open_nfd():
-    file = open('cosmoprime.xml')
+def open_nfd(a):
+    print(a)
+    file = os.path.join('nfd', a)
+    file = open(file)
     return file
 
 
@@ -76,7 +78,7 @@ def open_nfe_network(file_xml):
 
 def cnpj_compare(cnpj_nfe):
     if cnpj_nfe == get_cnpj_ref(open_nfd()):
-        print('CNPJ da nota de NFD corresponde ao CNPJ da NFE')
+        print('CNPJ da nota de NFD corresponde ao CNPJ da NFE\n')
 
 
 def get_products_compare(file_xml):
@@ -90,44 +92,65 @@ def get_products_compare(file_xml):
         ), code.getText(), unit.getText(), price.getText()
         price = locale.currency(float(price))
         unit = int(float(unit))
-        products_compare.append(
-            {'code': code, 'name': name, 'unit': unit, 'price': price})
-    return products_compare
+        # print(name)
+        products_nfd = get_products_nfd(open_nfd())
+        for product_nfd in products_nfd:
+            try:
+                if product_nfd['code'] == code:
+                    products_compare.append(
+                        {'code': code, 'name': name, 'unit': unit, 'price': price})
+            except:
+                print('Produto não encontrado nas duas NF ou códigos não correspondem')
+    return products_nfd, products_compare
 
 
 def products_compare(products, products_compare):
-    for productA in products:
-        for productB in products_compare:
-            if productA['code'] == productB['code']:
-                print()
-                print(
-                    f'''Produto encontrado nas duas NF: {productA['name']} ''')
-                print(f'''Código: {productA['code']} ''')
-                if productA['price'] == productB['price']:
-                    print(f'''Valor: {productA['price']} ''')
-                else:
-                    print('O valor da NFD é menor que o da NFE')
-                    print(f'''O valor da NFD é de: {productA['price']}''')
-                    print(f'''O valor da NFE é de: {productB['price']}''')
-                if productA['unit'] <= productB['unit']:
-                    print(f'''QTD: {productA['unit']} ''')
-                else:
-                    print('A quantidade devolvida é maior')
-                    print(f'''A quantidade comprada foi: {productB['unit']}''')
-                    print(f'''A quantidade devolvida foi: {productA['unit']}''')
-    pass
+    for productA, productB in zip(products, products_compare):
+        if productA['price'] != productB['price']:
+            print()
+            return f'''
+            Produto encontrado nas duas NF contém divergencia: {productA['name']}\n
+            Código do produto: {productA['code']}\n
+            O valor da NFD é menor que o da NFE\n
+            O valor da NFD é de: {productA['price']}\n
+            O valor da NFE é de: {productB['price']}\n
+            '''
+        if productA['unit'] > productB['unit']:
+            print()
+            return f'''
+            Produto encontrado nas duas NF: {productA['name']}\n
+            Código do produto: {productA['code']}\n
+            A quantidade devolvida é maior \n
+            A quantidade da NFD foi: {productA['unit']}\n
+            A quantidade da NFE foi: {productB['unit']}
+            '''
+        else:
+            if productA['price'] == productB['price'] and productA['unit'] <= productB['unit']:
+                print(f'''{productA['name']} - OK''')
+
+
+def check_nf(status):
+    if status == None:
+        print('\nStatus NFS: NFS são semelhantes')
+    else:
+        print('Status NFS:', status)
 
 
 def start():
-    a = find_file_xml(open_folder_network(get_cnpj_ref(open_nfd())))
-    b = open_nfe_network(a)
-    cnpj_compare(b)
-    get_products_compare(a)
-    products_compare(get_products_nfd(open_nfd()), get_products_compare(a))
-    get_code_ref(open_nfd())
-    get_products_nfd(open_nfd())
+    dirs = os.listdir('nfd')
+    for dir in dirs:
+        print(open_nfd(dir))
+        folder_network = open_folder_network(get_cnpj_ref(open_nfd(dir)))
+        find_xml = find_file_xml(folder_network)
+        print(find_xml)
+        #a = find_file_xml(open_folder_network(get_cnpj_ref(open_nfd(dir))))
+        #b = open_nfe_network(a)
+        #cnpj_compare(b)
+        #c, d = get_products_compare(a)
+        #ok = products_compare(c, d)
+        #check_nf(ok)
 
-    open_nfd().close()
+    #open_nfd().close()
 
 
 start()
