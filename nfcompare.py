@@ -19,8 +19,7 @@ def get_cnpj_ref(file):
 
 def get_code_ref(file):
     soup = BeautifulSoup(file, 'lxml')
-    code_ref = soup.find('refnfe').getText()
-    code_ref = code_ref[30:34]
+    code_ref = soup.find('refnfe').getText()[30:34]
     return code_ref
 
 
