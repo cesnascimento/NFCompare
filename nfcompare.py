@@ -125,7 +125,7 @@ def product_compare(products_nfd, products_compare):
             ''')
         else:
             if product_nfd['price'] == product_nfe['price'] and product_nfd['unit'] <= product_nfd['unit']:
-                msg = msg+f'''{product_nfd['name']} - <strong>✓ OK</strong><br>'''
+                msg = msg+f'''{product_nfd['name']} - <strong>OK ✓</strong><br>'''
     return list_alert, msg
 
 
@@ -177,7 +177,7 @@ def send_email(account, code_ref, folder_network, file_nfe, cnpjs_compare, msg_a
                     <strong>CNPJ:</strong> {cnpj_nfd}<br/>
                     </p>
                     <p>
-                    <strong> {cnpjs_compare}</strong>
+                    <strong>{cnpjs_compare}</strong>
                     </p>
                     <p>
                     {msg_a}
