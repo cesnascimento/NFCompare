@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 import os
 import locale
 from time import sleep
@@ -98,7 +97,7 @@ def get_products_compare(products_nfd, nfe_xml):
                         {'code': code, 'name': name, 'unit': unit, 'price': price})
             except:
                 print(
-                    'O codigo do produto não consta em nenhum dos dois documentos')
+                    'O código do produto não consta em nenhum dos documentos')
     return products_nfd, products_compare
 
 
@@ -156,7 +155,8 @@ def refresh_token():
     return account
 
 
-def send_email(account, code_ref, folder_network, file_nfe, cnpjs_compare, msg_a, msg_b, name, fant, cnpj_nfd):
+def send_email(code_ref, folder_network, file_nfe, cnpjs_compare, msg_a, msg_b, name, fant, cnpj_nfd):
+    account = refresh_token()
     if account.is_authenticated == True:
         m = account.new_message()
         m.to.add('cowlfnt@gmail.com')
@@ -176,15 +176,9 @@ def send_email(account, code_ref, folder_network, file_nfe, cnpjs_compare, msg_a
                     <strong>Nome Fantasia:</strong> {fant}<br/>
                     <strong>CNPJ:</strong> {cnpj_nfd}<br/>
                     </p>
-                    <p>
-                    <strong>{cnpjs_compare}</strong>
-                    </p>
-                    <p>
-                    {msg_a}
-                    </p>
-                    <p>
-                    {msg_b}
-                    </p>
+                    <p><strong>{cnpjs_compare}</strong></p>
+                    <p>{msg_a}</p>
+                    <p>{msg_b}</p>
                 </body>
             </html>"""
         m.body = body
@@ -214,9 +208,9 @@ def start():
             a, b = product_compare(product_nfd, product_nfe)
             msg_a, msg_b = check_nf(a, b)
             open_nfd(dir).close()
-            send_email(refresh_token(), code_ref, folder_network, file_nfe,
+            send_email(code_ref, folder_network, file_nfe,
                        cnpjs_compare, msg_a, msg_b, name, fant, cnpj_nfd)
-            sleep(10)
+            sleep(5)
             delete_nfd(dir)
         except:
             print(f'O robô não consegue abrir este arquivo XML: {dir}')
